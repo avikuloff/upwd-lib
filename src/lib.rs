@@ -38,7 +38,7 @@ impl Pool {
 
 
     /// Extracts all chars from string and adds them to the pool
-    pub fn extend_from_string(&mut self, s: String) -> &mut Self {
+    pub fn extend_from_string(&mut self, s: &str) -> &mut Self {
         self.0.extend(s.chars().collect::<IndexSet<char>>());
 
         self
@@ -82,9 +82,9 @@ impl Pool {
     /// # use upwd_lib::Pool;
     /// let pool = "ABCDEFG".parse::<Pool>().unwrap();
     ///
-    /// assert!(pool.contains_all("DAG".to_owned()))
+    /// assert!(pool.contains_all("DAG"))
     /// ```
-    pub fn contains_all(&self, elements: String) -> bool {
+    pub fn contains_all(&self, elements: &str) -> bool {
         self.0
             .is_superset(&elements.chars().collect::<IndexSet<char>>())
     }
@@ -173,7 +173,7 @@ mod tests {
         let mut other_pool = pool.clone();
 
         other_pool.insert('D');
-        pool.extend_from_string("D".to_owned());
+        pool.extend_from_string("D");
 
         assert_eq!(other_pool, pool)
     }
