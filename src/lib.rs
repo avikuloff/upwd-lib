@@ -27,8 +27,8 @@ impl Pool {
     ///
     /// # Examples
     /// ```
-    /// # use indexmap::IndexSet;
-    /// let pool = "0123456789".chars().collect::<IndexSet<char>>();
+    /// # use upwd_lib::Pool;
+    /// let pool = "0123456789".parse::<Pool>().unwrap();
     ///
     /// assert_eq!(pool.len(), 10)
     /// ```
@@ -36,7 +36,8 @@ impl Pool {
         self.0.len()
     }
 
-    /// Extracts all chars from the string and adds them to the pool
+
+    /// Extracts all chars from string and adds them to the pool
     pub fn extend_from_string(&mut self, s: String) -> &mut Self {
         self.0.extend(s.chars().collect::<IndexSet<char>>());
 
@@ -44,6 +45,14 @@ impl Pool {
     }
 
     /// Returns true if pool contains no elements
+    ///
+    /// # Examples
+    /// ```
+    /// # use upwd_lib::Pool;
+    /// let pool = Pool::new();
+    ///
+    /// assert!(pool.is_empty())
+    /// ```
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
@@ -53,15 +62,37 @@ impl Pool {
         self.0.get_index(index)
     }
 
-    /// Returns true if pool contains char `element`
+    /// Check if `element` exists in the pool
+    ///
+    /// # Examples
+    /// ```
+    /// # use upwd_lib::Pool;
+    /// let pool = "ABCDEFG".parse::<Pool>().unwrap();
+    ///
+    /// assert!(pool.contains('D'))
+    /// ```
     pub fn contains(&self, element: char) -> bool {
         self.0.contains(&element)
     }
 
     /// Returns true if pool contains each char from the string `elements`
+    ///
+    /// # Examples
+    /// ```
+    /// # use upwd_lib::Pool;
+    /// let pool = "ABCDEFG".parse::<Pool>().unwrap();
+    ///
+    /// assert!(pool.contains_all("DAG".to_owned()))
+    /// ```
     pub fn contains_all(&self, elements: String) -> bool {
         self.0
             .is_superset(&elements.chars().collect::<IndexSet<char>>())
+    }
+
+    /// Insert char to pool.
+    /// If an equivalent char already exists in the pool, then the pool is not changed.
+    pub fn insert(&mut self, ch: char) {
+        self.0.insert(ch);
     }
 }
 
@@ -127,6 +158,25 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_insert() {
+        let mut pool = "ABC".parse::<Pool>().unwrap();
+        pool.insert('D');
+
+        assert_eq!(pool, "ABCD".parse::<Pool>().unwrap())
+    }
+
+    #[test]
+    fn pool_extend_from_string() {
+        let mut pool = "ABC".parse::<Pool>().unwrap();
+        let mut other_pool = pool.clone();
+
+        other_pool.insert('D');
+        pool.extend_from_string("D".to_owned());
+
+        assert_eq!(other_pool, pool)
+    }
 
     #[test]
     fn pool_from_string() {
