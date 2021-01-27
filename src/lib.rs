@@ -2,20 +2,25 @@ use indexmap::IndexSet;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use rand::Rng;
+use std::str::FromStr;
+use std::char::ParseCharError;
 
 /// Collection of unique chars
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Pool(IndexSet<char>);
 
+impl FromStr for Pool {
+    type Err = ParseCharError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        Ok(Pool(s.chars().collect::<IndexSet<char>>()))
+    }
+}
+
 impl Pool {
     /// Create new empty pool
     pub fn new() -> Self {
         Pool(IndexSet::new())
-    }
-
-    /// Create new pool from [`std::string::String`]
-    pub fn from_string(s: String) -> Self {
-        Pool(s.chars().collect::<IndexSet<char>>())
     }
 
     /// Return number of chars in the pool
@@ -60,14 +65,13 @@ impl Pool {
     }
 }
 
-// Fix Example
 /// Generate random password.
 ///
 /// # Examples
 /// ```
 /// # use upwd_lib::{Pool, generate_password};
-/// let pool = "0123456789".to_owned();
-/// let password = generate_password(&Pool::from_string(pool), 15);
+/// let pool = "0123456789".parse().unwrap();
+/// let password = generate_password(&pool, 15);
 ///
 /// assert_eq!(password.len(), 15);
 /// ```
@@ -123,6 +127,20 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_from_string() {
+        let indexset: IndexSet<_> = "0123456789".chars().collect();
+
+        assert_eq!(Pool(indexset), "0123456789".to_owned().parse().unwrap())
+    }
+
+    #[test]
+    fn pool_from_str() {
+        let indexset: IndexSet<_> = "0123456789".chars().collect();
+
+        assert_eq!(Pool(indexset), "0123456789".parse().unwrap())
+    }
 
     #[test]
     fn generate_password_assert_len() {
