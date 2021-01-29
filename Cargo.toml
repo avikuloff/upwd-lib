@@ -1,6 +1,7 @@
 [package]
 name = "upwd-lib"
 version = "0.1.0"
+license = "MIT OR Apache-2.0"
 authors = ["Andrey Vikulov <avikuloff@yandex.ru>"]
 edition = "2018"
 
@@ -10,4 +11,4 @@ edition = "2018"
 rand = "0.7"
 num-bigint = "0.3"
 num-traits = "0.2"
-indexmap = { version = "1.6", features = ["serde-1"] }
+indexmap = "1.6"
