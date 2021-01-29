@@ -2,8 +2,8 @@ use indexmap::IndexSet;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use rand::Rng;
-use std::str::FromStr;
 use std::char::ParseCharError;
+use std::str::FromStr;
 
 /// Collection of unique chars
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -28,14 +28,13 @@ impl Pool {
     /// # Examples
     /// ```
     /// # use upwd_lib::Pool;
-    /// let pool = "0123456789".parse::<Pool>().unwrap();
+    /// let pool: Pool = "0123456789".parse().unwrap();
     ///
     /// assert_eq!(pool.len(), 10)
     /// ```
     pub fn len(&self) -> usize {
         self.0.len()
     }
-
 
     /// Extracts all chars from string and adds them to the pool
     pub fn extend_from_string(&mut self, s: &str) -> &mut Self {
@@ -58,7 +57,7 @@ impl Pool {
     }
 
     /// Get char by index
-    pub fn get(&self, index: usize) -> Option<&char> {
+    pub(crate) fn get(&self, index: usize) -> Option<&char> {
         self.0.get_index(index)
     }
 
@@ -67,12 +66,12 @@ impl Pool {
     /// # Examples
     /// ```
     /// # use upwd_lib::Pool;
-    /// let pool = "ABCDEFG".parse::<Pool>().unwrap();
+    /// let pool: Pool = "ABCDEFG".parse().unwrap();
     ///
     /// assert!(pool.contains('D'))
     /// ```
-    pub fn contains(&self, element: char) -> bool {
-        self.0.contains(&element)
+    pub fn contains(&self, ch: char) -> bool {
+        self.0.contains(&ch)
     }
 
     /// Returns true if pool contains each char from the string `elements`
@@ -80,7 +79,7 @@ impl Pool {
     /// # Examples
     /// ```
     /// # use upwd_lib::Pool;
-    /// let pool = "ABCDEFG".parse::<Pool>().unwrap();
+    /// let pool: Pool = "ABCDEFG".parse().unwrap();
     ///
     /// assert!(pool.contains_all("DAG"))
     /// ```
@@ -91,7 +90,8 @@ impl Pool {
 
     /// Insert char to pool.
     /// If an equivalent char already exists in the pool, then the pool is not changed.
-    pub fn insert(&mut self, ch: char) {
+    #[allow(dead_code)]
+    pub(crate) fn insert(&mut self, ch: char) {
         self.0.insert(ch);
     }
 }
@@ -158,6 +158,62 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_contains_all() {
+        let pool: Pool = "0123456789".parse().unwrap();
+
+        assert!(pool.contains_all("2357"));
+    }
+
+    #[test]
+    fn pool_contains_all_assert_false() {
+        let pool: Pool = "0123456789".parse().unwrap();
+
+        assert!(!pool.contains_all("0123F"));
+    }
+
+    #[test]
+    fn pool_contains() {
+        let pool: Pool = "0123456789".parse().unwrap();
+
+        assert!(pool.contains('5'));
+    }
+
+    #[test]
+    fn pool_contains_assert_false() {
+        let pool: Pool = "0123456789".parse().unwrap();
+
+        assert!(!pool.contains('A'));
+    }
+
+    #[test]
+    fn pool_get() {
+        let pool: Pool = "ABCD".parse().unwrap();
+
+        assert_eq!(pool.get(0), Some(&'A'))
+    }
+
+    #[test]
+    fn pool_is_empty() {
+        let pool = Pool::new();
+
+        assert!(pool.is_empty());
+    }
+
+    #[test]
+    fn pool_is_empty_assert_false() {
+        let pool = Pool::from_str("0123456789").unwrap();
+
+        assert!(!pool.is_empty());
+    }
+
+    #[test]
+    fn pool_len() {
+        let pool: Pool = "0123456789".parse().unwrap();
+
+        assert_eq!(pool.len(), 10)
+    }
 
     #[test]
     fn pool_insert() {
