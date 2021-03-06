@@ -107,6 +107,14 @@ impl Pool {
     pub fn iter(&self) -> Iter<'_, char> {
         self.0.iter()
     }
+
+    pub fn swap_remove(&mut self, ch: &char) -> bool {
+        self.0.swap_remove(ch)
+    }
+
+    pub fn shift_remove(&mut self, ch: &char) -> bool {
+        self.0.shift_remove(ch)
+    }
 }
 
 /// Generate random password.
@@ -171,6 +179,24 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_swap_remove() {
+        let mut pool: Pool = "abcdefz".parse().unwrap();
+
+        assert!(pool.swap_remove(&'b'));
+        assert_eq!(pool.get(1), Some(&'z'));
+        assert_eq!(pool.get(6), None);
+    }
+
+    #[test]
+    fn pool_shift_remove() {
+        let mut pool: Pool = "abcdefz".parse().unwrap();
+
+        assert!(pool.shift_remove(&'b'));
+        assert_eq!(pool.get(1), Some(&'c'));
+        assert_eq!(pool.get(6), None);
+    }
 
     #[test]
     fn pool_iter() {
