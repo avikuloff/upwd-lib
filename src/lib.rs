@@ -1,11 +1,11 @@
+use indexmap::set::Iter;
 use indexmap::IndexSet;
 use num_bigint::BigUint;
 use num_traits::ToPrimitive;
 use rand::Rng;
 use std::char::ParseCharError;
-use std::str::FromStr;
 use std::fmt;
-use indexmap::set::Iter;
+use std::str::FromStr;
 
 /// Collection of unique chars
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -115,6 +115,12 @@ impl Pool {
     pub fn shift_remove(&mut self, ch: &char) -> bool {
         self.0.shift_remove(ch)
     }
+
+    pub fn remove_all(&mut self, elements: &str) {
+        elements.chars().for_each(|ch| {
+            self.swap_remove(&ch);
+        });
+    }
 }
 
 /// Generate random password.
@@ -179,6 +185,14 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_remove_all() {
+        let mut pool: Pool = "abcde".parse().unwrap();
+        pool.remove_all("ace");
+
+        assert_eq!(pool, "bd".parse::<Pool>().unwrap());
+    }
 
     #[test]
     fn pool_swap_remove() {
