@@ -4,6 +4,8 @@ use num_traits::ToPrimitive;
 use rand::Rng;
 use std::char::ParseCharError;
 use std::str::FromStr;
+use std::fmt;
+use indexmap::set::Iter;
 
 /// Collection of unique chars
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -14,6 +16,12 @@ impl FromStr for Pool {
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         Ok(Pool(s.chars().collect::<IndexSet<char>>()))
+    }
+}
+
+impl fmt::Display for Pool {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.0.iter().collect::<String>())
     }
 }
 
@@ -94,6 +102,11 @@ impl Pool {
     pub(crate) fn insert(&mut self, ch: char) {
         self.0.insert(ch);
     }
+
+    /// Returns iterator
+    pub fn iter(&self) -> Iter<'_, char> {
+        self.0.iter()
+    }
 }
 
 /// Generate random password.
@@ -158,6 +171,23 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_iter() {
+        let pool: Pool = "abcdefz".parse().unwrap();
+        let mut iter = pool.iter();
+
+        assert_eq!(iter.next(), Some(&'a'));
+        assert_eq!(iter.next(), Some(&'b'));
+        assert_eq!(iter.last(), Some(&'z'));
+    }
+
+    #[test]
+    fn pool_display() {
+        let pool: Pool = "0123456789".parse().unwrap();
+
+        assert_eq!(pool.to_string(), "0123456789".to_owned());
+    }
 
     #[test]
     fn pool_contains_all() {
