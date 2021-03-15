@@ -21,6 +21,12 @@ impl FromIterator<char> for Pool {
     }
 }
 
+impl Extend<char> for Pool {
+    fn extend<T: IntoIterator<Item = char>>(&mut self, iter: T) {
+        self.0.extend(iter)
+    }
+}
+
 impl FromStr for Pool {
     type Err = ParseCharError;
 
@@ -198,6 +204,14 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_extend() {
+        let mut pool = Pool::from_str("abc").unwrap();
+        pool.extend(vec!['d', 'e']);
+
+        assert_eq!(pool, Pool::from_str("abcde").unwrap())
+    }
 
     #[test]
     fn pool_from_iter() {
