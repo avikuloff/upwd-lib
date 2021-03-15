@@ -69,7 +69,7 @@ impl Pool {
         self.0.get_index(index)
     }
 
-    /// Check if `element` exists in the pool
+    /// Check if char exists in the pool
     ///
     /// # Examples
     /// ```
@@ -108,14 +108,17 @@ impl Pool {
         self.0.iter()
     }
 
+    /// Remove char from pool. Like a [Vec::swap_remove]
     pub fn swap_remove(&mut self, ch: &char) -> bool {
         self.0.swap_remove(ch)
     }
 
+    /// Remove char from pool. Like a [Vec::remove]
     pub fn shift_remove(&mut self, ch: &char) -> bool {
         self.0.shift_remove(ch)
     }
 
+    /// Remove all chars of the string `elements` from pool
     pub fn remove_all(&mut self, elements: &str) {
         elements.chars().for_each(|ch| {
             self.swap_remove(&ch);
