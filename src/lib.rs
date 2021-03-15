@@ -5,11 +5,21 @@ use num_traits::ToPrimitive;
 use rand::Rng;
 use std::char::ParseCharError;
 use std::fmt;
+use std::iter::FromIterator;
 use std::str::FromStr;
 
 /// Collection of unique chars
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Pool(IndexSet<char>);
+
+impl FromIterator<char> for Pool {
+    fn from_iter<I: IntoIterator<Item = char>>(iter: I) -> Self {
+        let mut pool = Pool::new();
+        pool.0 = IndexSet::from_iter(iter);
+
+        pool
+    }
+}
 
 impl FromStr for Pool {
     type Err = ParseCharError;
@@ -188,6 +198,13 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_from_iter() {
+        let iter = vec!['a', 'b', 'c'].into_iter();
+
+        assert_eq!(iter.collect::<Pool>(), Pool::from_str("abc").unwrap());
+    }
 
     #[test]
     fn pool_remove_all() {
