@@ -176,12 +176,7 @@ pub fn generate_password(pool: &Pool, length: usize) -> String {
 ///
 /// assert_eq!(calculate_entropy(12, 64), 72.0);
 /// ```
-///
-/// # Panics
-/// Panics if `pool_size` is zero
 pub fn calculate_entropy(length: usize, pool_size: usize) -> f64 {
-    assert!(pool_size > 0, "Pool size must be greater than zero!");
-
     BigUint::from(pool_size)
         .pow(length as u32)
         .to_f64()
@@ -383,9 +378,10 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "Pool size must be greater than zero!")]
     fn calculate_entropy_passed_pool_size_is_0() {
-        calculate_entropy(12, 0);
+        let entropy = calculate_entropy(12, 0);
+
+        assert_eq!(entropy, f64::NEG_INFINITY)
     }
 
     #[test]
