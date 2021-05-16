@@ -6,11 +6,26 @@ use rand::Rng;
 use std::char::ParseCharError;
 use std::fmt;
 use std::iter::FromIterator;
+use std::ops::{Deref, DerefMut};
 use std::str::FromStr;
 
 /// Collection of unique chars. This is wrapper for [`IndexSet<char>`]
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Pool(IndexSet<char>);
+
+impl Deref for Pool {
+    type Target = IndexSet<char>;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl DerefMut for Pool {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.0
+    }
+}
 
 impl FromIterator<char> for Pool {
     fn from_iter<I: IntoIterator<Item = char>>(iter: I) -> Self {
@@ -214,6 +229,21 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_deref_mut() {
+        let mut pool = Pool::from_str("12345").unwrap();
+        *pool = "abcde".chars().collect::<IndexSet<char>>();
+
+        assert_eq!(*pool, "abcde".chars().collect::<IndexSet<char>>())
+    }
+
+    #[test]
+    fn pool_deref() {
+        let pool = Pool::from_str("12345").unwrap();
+
+        assert_eq!(*pool, "12345".chars().collect::<IndexSet<char>>())
+    }
 
     #[test]
     fn pool_sort() {
