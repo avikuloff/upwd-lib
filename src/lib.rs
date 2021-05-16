@@ -8,7 +8,7 @@ use std::fmt;
 use std::iter::FromIterator;
 use std::str::FromStr;
 
-/// Collection of unique chars
+/// Collection of unique chars. This is wrapper for [`IndexSet<char>`]
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Pool(IndexSet<char>);
 
@@ -140,6 +140,21 @@ impl Pool {
             self.swap_remove(&ch);
         });
     }
+
+    /// Sorts the chars in the pool
+    ///
+    /// # Examples
+    /// ```
+    /// # use upwd_lib::Pool;
+    /// # use std::str::FromStr;
+    /// let mut pool = Pool::from_str("31524").unwrap();
+    /// pool.sort();
+    ///
+    /// assert_eq!(pool, Pool::from_str("12345").unwrap())
+    /// ```
+    pub fn sort(&mut self) {
+        self.0.sort()
+    }
 }
 
 /// Generate random password.
@@ -199,6 +214,14 @@ pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn pool_sort() {
+        let mut pool = Pool::from_str("31524").unwrap();
+        pool.sort();
+
+        assert_eq!(pool, Pool::from_str("12345").unwrap())
+    }
 
     #[test]
     fn pool_extend() {
