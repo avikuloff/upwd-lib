@@ -174,7 +174,7 @@ pub fn generate_password(pool: &Pool, length: usize) -> String {
 /// ```
 /// # use upwd_lib::calculate_entropy;
 ///
-/// assert_eq!(calculate_entropy(12, 64), 72.0);
+/// assert_eq!(calculate_entropy(12, 64), 72_f64);
 /// ```
 pub fn calculate_entropy(length: usize, pool_size: usize) -> f64 {
     BigUint::from(pool_size)
@@ -190,10 +190,10 @@ pub fn calculate_entropy(length: usize, pool_size: usize) -> f64 {
 /// ```
 /// # use upwd_lib::calculate_length;
 ///
-/// assert_eq!(calculate_length(128.0, 64.0).ceil(), 22.0);
+/// assert_eq!(calculate_length(128_f64, 64_f64), 22_f64);
 /// ```
 pub fn calculate_length(entropy: f64, pool_size: f64) -> f64 {
-    entropy / pool_size.log2()
+    (entropy / pool_size.log2()).ceil()
 }
 
 #[cfg(test)]
@@ -367,14 +367,14 @@ mod tests {
     fn calculate_entropy_assert_true() {
         let entropy = calculate_entropy(12, 64);
 
-        assert_eq!(entropy, 72.0);
+        assert_eq!(entropy, 72_f64);
     }
 
     #[test]
     fn calculate_entropy_passed_length_is_0() {
         let entropy = calculate_entropy(0, 64);
 
-        assert_eq!(entropy, 0.0)
+        assert_eq!(entropy, 0_f64)
     }
 
     #[test]
@@ -388,27 +388,48 @@ mod tests {
     fn calculate_entropy_passed_pool_size_is_1() {
         let entropy = calculate_entropy(12, 1);
 
-        assert_eq!(entropy, 0.0)
+        assert_eq!(entropy, 0_f64)
     }
 
     #[test]
     fn calculate_length_assert_true() {
-        let length = calculate_length(128.0, 64.0);
+        let length = calculate_length(128_f64, 64_f64);
 
-        assert_eq!(length.ceil(), 22.0);
+        assert_eq!(length, 22_f64);
     }
 
     #[test]
     fn calculate_length_entropy_is_0() {
-        let length = calculate_length(0.0, 64.0);
+        let length = calculate_length(0_f64, 64_f64);
 
-        assert_eq!(length, 0.0);
+        assert_eq!(length, 0_f64);
     }
 
     #[test]
     fn calculate_length_pool_size_is_0() {
-        let length = calculate_length(128.0, 0.0);
+        let length = calculate_length(128_f64, 0_f64);
 
-        assert_eq!(length, 0.0);
+        assert_eq!(length, 0_f64);
+    }
+
+    #[test]
+    fn calculate_length_entropy_and_pool_size_is_0() {
+        let length = calculate_length(0_f64, 0_f64);
+
+        assert_eq!(length, 0_f64);
+    }
+
+    #[test]
+    fn calculate_length_entropy_is_0_and_pool_size_is_1() {
+        let length = calculate_length(0_f64, 1_f64);
+
+        assert!(length.is_nan());
+    }
+
+    #[test]
+    fn calculate_length_entropy_is_1_and_pool_size_is_1() {
+        let length = calculate_length(1_f64, 1_f64);
+
+        assert_eq!(length, f64::INFINITY);
     }
 }

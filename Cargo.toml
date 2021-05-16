@@ -10,6 +10,6 @@ edition = "2018"
 
 [dependencies]
 rand = "0.7"
-num-bigint = "0.3"
+num-bigint = "0.4"
 num-traits = "0.2"
 indexmap = "1.6"
