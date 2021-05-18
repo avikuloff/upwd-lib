@@ -1,7 +1,5 @@
 use indexmap::set::Iter;
 use indexmap::IndexSet;
-use num_bigint::BigUint;
-use num_traits::ToPrimitive;
 use rand::Rng;
 use std::char::ParseCharError;
 use std::fmt;
@@ -207,11 +205,7 @@ pub fn generate_password(pool: &Pool, length: usize) -> String {
 /// assert_eq!(calculate_entropy(12, 64), 72_f64);
 /// ```
 pub fn calculate_entropy(length: usize, pool_size: usize) -> f64 {
-    BigUint::from(pool_size)
-        .pow(length as u32)
-        .to_f64()
-        .unwrap_or(f64::MAX)
-        .log2()
+    length as f64 * (pool_size as f64).log2()
 }
 
 /// Calculates the minimum password length required to obtain a given entropy.
