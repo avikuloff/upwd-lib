@@ -180,7 +180,7 @@ impl Pool {
 /// let pool = "0123456789".parse().unwrap();
 /// let password = generate_password(&pool, 15);
 ///
-/// assert_eq!(password.len(), 15);
+/// assert_eq!(password.chars().count(), 15);
 /// ```
 ///
 /// # Panics
@@ -405,7 +405,7 @@ mod tests {
         let pool = "0123456789".chars().collect::<IndexSet<char>>();
         let password = generate_password(&Pool(pool), 15);
 
-        assert_eq!(password.len(), 15);
+        assert_eq!(password.chars().count(), 15);
     }
 
     #[test]
